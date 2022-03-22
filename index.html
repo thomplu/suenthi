@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+<div class="piano">
+    <div class="paino__branding">
+        <div class="piano__logo">Sünti</div>
+        <div class="piano__info">
+            The tiny MIDI Pure JS synth
+        </div>
+    </div>
+    <div class="piano__controls">
+        <div class="controls__osc-type">
+            <div class="osc-type__label">Oscilator type</div>
+            <div class="controls__osc-type-inputs">
+                <label for="sine"><input checked type="radio" value="sine" id="sine" data-type="sine" name="osc-type">Sine</label>
+                <label for="square"><input type="radio" value="square" id="square" data-type="square" name="osc-type">Square</label>
+                <label for="sawtooth"><input type="radio" value="sawtooth" id="sawtooth" data-type="sawtooth"
+                                             name="osc-type">Saw</label>
+                <label for="triangle"><input type="radio" value="triangle" id="triangle" data-type="triangle"
+                                             name="osc-type">Triangle</label>
+            </div>
+        </div>
+    </div>
+    <div class="piano__keys"></div>
+    <div class="piano__octave">
+        <button class="octave__btn-up">up</button>
+        <div class="octave__val">0</div>
+        <button class="octave__btn-down">down</button>
+    </div>
+</div>
+</body>
+</html>

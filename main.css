@@ -1,0 +1,75 @@
+@import url(https://fonts.googleapis.com/css2?family=Mrs+Sheppards&display=swap);
+@import url(https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500&display=swap);
+:root {
+  --white-key-num: 15; }
+
+body {
+  background: #00a1ff;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 500;
+  color: #fff; }
+
+.piano {
+  margin: 0 auto;
+  border: 1px solid white;
+  border-radius: 10px;
+  display: block;
+  width: auto;
+  max-width: 500px;
+  padding: 10px 40px 40px 60px;
+  position: relative; }
+  .piano__controls {
+    padding: 15px 0;
+    font-size: 12px; }
+  .piano__logo {
+    font-size: 42px;
+    font-family: 'Mrs Sheppards', cursive;
+    color: white;
+    margin-bottom: -10px; }
+  .piano__info {
+    font-size: 14px;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 500;
+    color: white;
+    margin-bottom: 10px; }
+  .piano__keys {
+    display: flex; }
+  .piano__key {
+    width: 35px;
+    height: 100px;
+    min-height: 100px;
+    border: 1px solid white;
+    margin-left: 0px; }
+    .piano__key:first-child {
+      margin-left: 0; }
+    .piano__key.is--black {
+      background: white;
+      margin-left: -11px;
+      margin-right: -11px;
+      height: 65px;
+      min-height: 65px;
+      width: 20px;
+      z-index: 1; }
+    .piano__key.is--pressed {
+      background: rgba(204, 228, 255, 0.5); }
+  .piano__octave {
+    position: absolute;
+    left: 10px;
+    bottom: 68px;
+    color: white;
+    display: flex;
+    flex-direction: column; }
+    .piano__octave button {
+      font-size: 10px;
+      background: none;
+      border: 1px solid white;
+      color: white;
+      width: 39px;
+      border-radius: 4px; }
+
+.octave__val {
+  text-align: center;
+  font-size: 12px; }
+
+.osc-type__label {
+  margin-bottom: 5px; }
