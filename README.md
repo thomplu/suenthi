@@ -1,5 +1,4 @@
-# suenthi
-### A tiny polyphonic pure JS Synthesizer
+# Suenthi - A tiny polyphonic pure JS Synthesizer
 
 ## Play different waveforms
 

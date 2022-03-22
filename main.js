@@ -171,7 +171,7 @@ import './main.scss'
     createKeys();
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let oscArray = [];
+    let oscObject = {}
 
     // var gain = audioCtx.createGain();
     // const oscillator = audioCtx.createOscillator();
@@ -220,7 +220,11 @@ import './main.scss'
     oscTypeInputs.addEventListener('click', e => {
         oscType = oscTypeInputs.querySelector('input:checked').value || oscType;
         console.log('new osc type', oscType);
-    });
+    })
+
+    function generateRandomId() {
+        return Math.floor(Math.random()*0xca0e373ebffff+0x05c5e45240000).toString(36)
+    }
 
     function addOscVoice(key) {
         // var gain = audioCtx.createGain();
@@ -243,7 +247,10 @@ import './main.scss'
         newOsc.gainNode.gain.value = 0;
         newOsc.osc.connect(newOsc.gainNode);
         newOsc.gainNode.connect(audioCtx.destination);
-        return oscArray.push(newOsc) - 1 //Returns the index
+        const id = generateRandomId()
+        oscObject[id] = newOsc
+        console.log('oscObj', oscObject)
+        return id //Returns the index
     }
 
     function createKeys() {
@@ -284,26 +291,31 @@ import './main.scss'
 
     function stopPlaying(key) {
         console.log('STOP playing key', key);
-        const oscIndex = oscArray.findIndex(osc => osc.key === key);
-        if (oscIndex === -1) {
+        let oscId = undefined
+        Object.keys(oscObject).forEach(id => {
+            if (oscObject[id].key === key && !oscObject[id].release){
+                oscId = id
+            }
+        })
+        if (oscId === undefined) {
             console.error('Osc Index not found for ' + key);
             return
         }
-        oscArray[oscIndex].gainNode.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + release);
+        oscObject[oscId].gainNode.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + release);
+        oscObject[oscId].release = true
         setTimeout(() => {
-            oscArray[oscIndex].osc.stop();
+            oscObject[oscId].osc.stop();
             console.log('REMOVE OSC');
-            oscArray.splice(oscIndex, 1);
-            console.log('new stop oscArray', JSON.stringify(oscArray));
+            delete oscObject[oscId]
+            console.log('new stop oscObj', JSON.stringify(oscObject));
         }, release * 1000)
 
-        console.log('new stop oscArray', JSON.stringify(oscArray));
         document.querySelector(`.piano__key[data-key='${key}']`)?.classList.remove('is--pressed');
     }
 
     function playKey(keyName, octave, velocity) {
         const keyboardKey = `${keyName}${octave - octaveShift}`;
-        const key = `${keyName}${octave}`;
+        const key = `${keyName}${octave}`
         if (!KEY_FREQ[key]) return
         if (velocity === 0) {
             stopPlaying(key);
@@ -315,18 +327,17 @@ import './main.scss'
 
         $key?.classList.toggle('is--pressed', velocity > 0);
         if (velocity === 0) return
-        const oscIndex = addOscVoice(key);
+        const oscId = addOscVoice(key);
 
-        oscArray[oscIndex].osc.start();
-        oscArray[oscIndex].osc.frequency.value = freq;
+        oscObject[oscId].osc.start();
+        oscObject[oscId].osc.frequency.value = freq;
 
         if (velocity > 1) {
             velocity = 1;
         }
-        oscArray[oscIndex].gainNode.gain.linearRampToValueAtTime( MAX_VOL * velocity, audioCtx.currentTime + attack);
+        oscObject[oscId].gainNode.gain.linearRampToValueAtTime( MAX_VOL * velocity, audioCtx.currentTime + attack);
         // gain.gain.value = MAX_VOL * velocity;
-        // oscArray[oscIndex].gainNode.gain.value = MAX_VOL * velocity
-        console.log('new play oscArray', oscArray[oscIndex], JSON.stringify(oscArray));
+        console.log('new play oscObj', oscObject[oscId], JSON.stringify(oscObject));
     }
 
     function updateBaseOctave() {
