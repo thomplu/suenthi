@@ -310,7 +310,7 @@ import './main.scss'
             console.log('new stop oscObj', JSON.stringify(oscObject));
         }, release * 1000)
 
-        const htmlKeyId = key.slice(0,1) + (parseInt(key.slice(1,key.length)) - octaveShift)
+        const htmlKeyId = key.slice(0,key.length - 1) + (parseInt(key.slice(key.length - 1,key.length)) - octaveShift)
         console.log('key', key, 'octaveShift', octaveShift, 'htmlKeyId', htmlKeyId)
         document.querySelector(`.piano__key[data-key='${htmlKeyId}']`)?.classList.remove('is--pressed');
     }
