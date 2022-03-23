@@ -120,7 +120,9 @@
         const $octaveUpBtn = document.querySelector('.octave__btn-up');
         const $octaveDownBtn = document.querySelector('.octave__btn-down');
         const $octaveDisplay = document.querySelector('.octave__val');
-        const oscTypeInputs = document.querySelector('.controls__osc-type-inputs');
+        const $oscTypeInputs = document.querySelector('.controls__osc-type-inputs');
+        const $attackRange = document.getElementById('attack');
+        const $releaseRange = document.getElementById('release');
         document.documentElement.style.setProperty('--white-key-num', whiteKeyNum);
 
         function onMIDIMessage(event) {
@@ -219,9 +221,21 @@
             updateBaseOctave();
         });
 
-        oscTypeInputs.addEventListener('click', e => {
-            oscType = oscTypeInputs.querySelector('input:checked').value || oscType;
+        $oscTypeInputs.addEventListener('click', e => {
+            oscType = $oscTypeInputs.querySelector('input:checked').value || oscType;
             console.log('new osc type', oscType);
+        });
+
+        $attackRange.addEventListener('change', e => {
+            const val = $attackRange.value;
+            attack = val*3;
+            console.log('attack changed to', val);
+        });
+
+        $releaseRange.addEventListener('change', e => {
+            const val = $releaseRange.value;
+            release = val*3;
+            console.log('release changed to', val);
         });
 
         function generateRandomId() {
