@@ -10,8 +10,8 @@
         let octaveShift = 0;
         const SHOW_NUM_OCTAVES = 2;
         let oscType = 'sine';
-        let release = 0.5;
-        let attack = 0.5;
+        let release = 0.45;
+        let attack = 0.0;
         const whiteKeyNum = SHOW_NUM_OCTAVES * 7 + 1;
         const MAX_VOL = 0.3;
         const KEY_FREQ = {
@@ -228,13 +228,13 @@
 
         $attackRange.addEventListener('change', e => {
             const val = $attackRange.value;
-            attack = val*3;
+            attack = parseInt(val);
             console.log('attack changed to', val);
         });
 
         $releaseRange.addEventListener('change', e => {
             const val = $releaseRange.value;
-            release = val*3;
+            release = parseInt(val);
             console.log('release changed to', val);
         });
 
