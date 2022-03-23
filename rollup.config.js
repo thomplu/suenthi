@@ -1,8 +1,8 @@
-import resolve from '@rollup/plugin-node-resolve';
 import scss from 'rollup-plugin-scss';
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
-import copy from 'rollup-plugin-copy'
+// import resolve from '@rollup/plugin-node-resolve';
+// import copy from 'rollup-plugin-copy'
 
 // `npm run build` -> `production` is true
 // `npm run dev` -> `production` is false
@@ -20,13 +20,13 @@ export default {
             output: 'main.css',
             watch: 'main.scss'
         }),
-        copy({
-            targets: [
-                { src: 'index.html', dest: 'dist' },
-                { src: 'script.js', dest: 'dist' },
-                { src: 'main.css', dest: 'dist' },
-            ]
-        }),
+        // copy({
+        //     targets: [
+        //         { src: 'index.html', dest: 'dist' },
+        //         { src: 'script.js', dest: 'dist' },
+        //         { src: 'main.css', dest: 'dist' },
+        //     ]
+        // }),
         !production &&
         (serve({
             contentBase: '.',
