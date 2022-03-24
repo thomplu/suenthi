@@ -8,49 +8,85 @@
 }
 
 body {
-    background: #00a1ff;
+    background: #7d57ef;
     font-family: 'Quicksand', sans-serif;
     font-weight: 500;
     color: #fff;
 }
 
-.piano {
+
+.suenthi {
     margin: 0 auto;
     border: 1px solid white;
     border-radius: 10px;
     display: block;
     width: auto;
-    max-width: 500px;
-    padding: 10px 40px 40px 60px;
+    max-width: 640px;
     position: relative;
+}
 
-    &__branding {
+.branding {
+    padding: 15px;
+}
 
+.logo {
+    font-size: 42px;
+    font-family: 'Mrs Sheppards', cursive;
+    color: white;
+    margin-bottom: -10px;
+}
+
+.info {
+    font-size: 14px;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 500;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.controls {
+    padding: 0 0 15px 0;
+    font-size: 12px;
+
+    &__control-unit {
+        padding: 15px 40px;
     }
+}
 
-    &__controls {
-        padding: 15px 0;
-        font-size: 12px;
-    }
+.filter {
+    background: #40E7E7;
+}
 
-    &__logo {
-        font-size: 42px;
-        font-family: 'Mrs Sheppards', cursive;
+.envelope {
+    background: #da55f1;
+}
+
+.oscillator {
+    background: #72a5ef;
+
+}
+
+.keyboard {
+    display: flex;
+    padding: 15px;
+
+    &__octave {
+        flex-basis: 39px;
+        flex-grow: 0;
+        margin-right: 15px;
+        flex-shrink: 0;
         color: white;
-        margin-bottom: -10px;
-    }
-
-    &__info {
-        font-size: 14px;
-        font-family: 'Quicksand', sans-serif;
-        font-weight: 500;
-        color: white;
-        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
     }
 
     &__keys {
-        display: flex;
+        flex-grow: 1;
     }
+}
+
+.keys {
+    display: flex;
 
     &__key {
         width: 35px;
@@ -79,29 +115,21 @@ body {
             background: rgba(#CCE4FF, 0.5);
         }
     }
-    &__octave {
-        position: absolute;
-        left:10px;
-        bottom: 68px;
-        color: white;
-        display: flex;
-        flex-direction: column;
-
-        button {
-            font-size: 10px;
-            background: none;
-            border: 1px solid white;
-            color: white;
-            width: 39px;
-            border-radius: 4px;
-        }
-    }
 }
 
 .octave {
     &__val {
         text-align: center;
         font-size: 12px;
+    }
+
+    button {
+        font-size: 10px;
+        background: none;
+        border: 1px solid white;
+        color: white;
+        width: 39px;
+        border-radius: 4px;
     }
 }
 

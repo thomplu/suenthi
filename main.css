@@ -4,45 +4,76 @@
   --white-key-num: 15; }
 
 body {
-  background: #00a1ff;
+  background: #7d57ef;
   font-family: 'Quicksand', sans-serif;
   font-weight: 500;
   color: #fff; }
 
-.piano {
+.suenthi {
   margin: 0 auto;
   border: 1px solid white;
   border-radius: 10px;
   display: block;
   width: auto;
-  max-width: 500px;
-  padding: 10px 40px 40px 60px;
+  max-width: 640px;
   position: relative; }
-  .piano__controls {
-    padding: 15px 0;
-    font-size: 12px; }
-  .piano__logo {
-    font-size: 42px;
-    font-family: 'Mrs Sheppards', cursive;
+
+.branding {
+  padding: 15px; }
+
+.logo {
+  font-size: 42px;
+  font-family: 'Mrs Sheppards', cursive;
+  color: white;
+  margin-bottom: -10px; }
+
+.info {
+  font-size: 14px;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 500;
+  color: white;
+  margin-bottom: 10px; }
+
+.controls {
+  padding: 0 0 15px 0;
+  font-size: 12px; }
+  .controls__control-unit {
+    padding: 15px 40px; }
+
+.filter {
+  background: #40E7E7; }
+
+.envelope {
+  background: #da55f1; }
+
+.oscillator {
+  background: #72a5ef; }
+
+.keyboard {
+  display: flex;
+  padding: 15px; }
+  .keyboard__octave {
+    flex-basis: 39px;
+    flex-grow: 0;
+    margin-right: 15px;
+    flex-shrink: 0;
     color: white;
-    margin-bottom: -10px; }
-  .piano__info {
-    font-size: 14px;
-    font-family: 'Quicksand', sans-serif;
-    font-weight: 500;
-    color: white;
-    margin-bottom: 10px; }
-  .piano__keys {
-    display: flex; }
-  .piano__key {
+    display: flex;
+    flex-direction: column; }
+  .keyboard__keys {
+    flex-grow: 1; }
+
+.keys {
+  display: flex; }
+  .keys__key {
     width: 35px;
     height: 100px;
     min-height: 100px;
     border: 1px solid white;
     margin-left: 0px; }
-    .piano__key:first-child {
+    .keys__key:first-child {
       margin-left: 0; }
-    .piano__key.is--black {
+    .keys__key.is--black {
       background: white;
       margin-left: -11px;
       margin-right: -11px;
@@ -50,26 +81,20 @@ body {
       min-height: 65px;
       width: 20px;
       z-index: 1; }
-    .piano__key.is--pressed {
+    .keys__key.is--pressed {
       background: rgba(204, 228, 255, 0.5); }
-  .piano__octave {
-    position: absolute;
-    left: 10px;
-    bottom: 68px;
-    color: white;
-    display: flex;
-    flex-direction: column; }
-    .piano__octave button {
-      font-size: 10px;
-      background: none;
-      border: 1px solid white;
-      color: white;
-      width: 39px;
-      border-radius: 4px; }
 
 .octave__val {
   text-align: center;
   font-size: 12px; }
+
+.octave button {
+  font-size: 10px;
+  background: none;
+  border: 1px solid white;
+  color: white;
+  width: 39px;
+  border-radius: 4px; }
 
 .osc-type__label {
   margin-bottom: 5px; }

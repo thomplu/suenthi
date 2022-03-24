@@ -5,11 +5,7 @@ import './main.scss'
 
     const NOTE_NAMES = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"]
     const baseOctaveIndex = 3 //Octave index of the lower ocatave on the keyboard
-    let octaveShift = 0
     const SHOW_NUM_OCTAVES = 2
-    let oscType = 'sine'
-    let release = 0.45
-    let attack = 0.0
     const whiteKeyNum = SHOW_NUM_OCTAVES * 7 + 1
     const MAX_VOL = 0.3
     const KEY_FREQ = {
@@ -112,8 +108,17 @@ import './main.scss'
         "c8": 4186.01
     };
 
+    //Controls values
+
+    let octaveShift = 0
+    let oscType = 'sine'
+    let release = 0.45
+    let attack = 0.0
+    let filterFreq = 1000
+
     //Node elements
-    const $keyBoard = document.querySelector('.piano__keys');
+    const $keyBoard = document.querySelector('.keyboard');
+    const $keys = document.querySelector('.keys');
     document.querySelector('#audio-btn');
     const $octaveUpBtn = document.querySelector('.octave__btn-up');
     const $octaveDownBtn = document.querySelector('.octave__btn-down');
@@ -121,7 +126,34 @@ import './main.scss'
     const $oscTypeInputs = document.querySelector('.controls__osc-type-inputs');
     const $attackRange = document.getElementById('attack')
     const $releaseRange = document.getElementById('release')
+    const $filterFreqRange = document.getElementById('filter-freq')
     document.documentElement.style.setProperty('--white-key-num', whiteKeyNum);
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const filter = audioCtx.createBiquadFilter();
+    // const distortion = audioCtx.createWaveShaper();
+    const merger = audioCtx.createChannelMerger(2);
+    const mainGain = audioCtx.createGain()
+    // const source = audioCtx.createMediaStreamSource(stream);
+    // source.connect(filter);
+    // distortion.connect(biquadFilter);
+    // filter.connect(mainGain);
+    // mainGain.connect(audioCtx.destination)
+    // mainGain.connect(filter).connect(audioCtx.destination)
+    merger.connect(filter).connect(mainGain).connect(audioCtx.destination)
+    mainGain.gain.setValueAtTime(1, audioCtx.currentTime);
+
+// Manipulate the Biquad filter
+
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(filterFreq, audioCtx.currentTime);
+    filter.gain.setValueAtTime(25, audioCtx.currentTime);
+
+
+    let oscObject = {}
+
+    createKeys();
+
 
     function onMIDIMessage(event) {
 
@@ -169,11 +201,6 @@ import './main.scss'
             startLoggingMIDIInput(midiAccess);
         });
     }
-
-    createKeys();
-
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let oscObject = {}
 
     // var gain = audioCtx.createGain();
     // const oscillator = audioCtx.createOscillator();
@@ -236,6 +263,17 @@ import './main.scss'
         console.log('release changed to', val)
     })
 
+    $filterFreqRange.addEventListener('change', e => {
+        const val = $filterFreqRange.value
+        filterFreq = parseInt(val)
+        filter.frequency.value = parseInt(filterFreq)
+        mainGain.disconnect(filter)
+        mainGain.connect(filter)
+        console.log('filter freq changed to', val, filter)
+    })
+
+
+
     function generateRandomId() {
         return Math.floor(Math.random()*0xca0e373ebffff+0x05c5e45240000).toString(36)
     }
@@ -260,7 +298,8 @@ import './main.scss'
 
         newOsc.gainNode.gain.value = 0;
         newOsc.osc.connect(newOsc.gainNode);
-        newOsc.gainNode.connect(audioCtx.destination);
+        // newOsc.gainNode.connect(audioCtx.destination);
+        newOsc.gainNode.connect(merger, 0, );
         const id = generateRandomId()
         oscObject[id] = newOsc
         console.log('oscObj', oscObject)
@@ -285,11 +324,11 @@ import './main.scss'
         $key.dataset.key = keyName.toLowerCase() + octave;
         $key.dataset.keyname = keyName.toLowerCase();
         $key.dataset.octave = octave;
-        $key.classList.add('piano__key');
+        $key.classList.add('keys__key');
         $key.id = `${keyName}${octave}`;
         console.log('last char', keyName.substr(keyName.length - 1));
         keyName.substr(keyName.length - 1) === '#' ? $key.classList.add('is--black') : 0;
-        $keyBoard.appendChild($key);
+        $keys.appendChild($key);
     }
 
     function mousePressed($key, pressed) {

@@ -7,15 +7,23 @@
     <script src="script.js" defer></script>
 </head>
 <body>
-<div class="piano">
-    <div class="piano__branding">
-        <div class="piano__logo">Sünti</div>
-        <div class="piano__info">
+<div class="suenthi">
+    <div class="branding">
+        <div class="logo">Sünti</div>
+        <div class="info">
             The tiny MIDI Pure JS synth
         </div>
     </div>
-    <div class="piano__controls">
-        <div class="controls__adsr">
+    <div class="controls">
+        <div class="controls__control-unit filter">
+            <div class="osc-type__label">Filter</div>
+            <div class="filter__range">
+                <input type="range" id="filter-freq" name="filter-freq"
+                       min="20" max="20000" step="0.5" value="1000">
+                <label for="attack">Filter Cue</label>
+            </div>
+        </div>
+        <div class="controls__control-unit envelope">
             <div class="osc-type__label">Envelope</div>
             <div class="adsr__range">
                 <input type="range" id="attack" name="attack"
@@ -28,7 +36,7 @@
                 <label for="release">Release</label>
             </div>
         </div>
-        <div class="controls__osc-type">
+        <div class="controls__control-unit is--oscillator oscillator">
             <div class="osc-type__label">Oscilator type</div>
             <div class="controls__osc-type-inputs">
                 <label for="sine"><input checked type="radio" value="sine" id="sine" data-type="sine" name="osc-type">Sine</label>
@@ -40,12 +48,15 @@
             </div>
         </div>
     </div>
-    <div class="piano__keys"></div>
-    <div class="piano__octave">
-        <button class="octave__btn-up">up</button>
-        <div class="octave__val">0</div>
-        <button class="octave__btn-down">down</button>
+    <div class="keyboard">
+        <div class="keyboard__octave octave">
+            <button class="octave__btn-up">up</button>
+            <div class="octave__val">0</div>
+            <button class="octave__btn-down">down</button>
+        </div>
+        <div class="keyboard__keys keys"></div>
     </div>
+
 </div>
 </body>
 </html>
