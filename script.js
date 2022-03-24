@@ -10,6 +10,7 @@
         const SHOW_NUM_OCTAVES = 2;
         const whiteKeyNum = SHOW_NUM_OCTAVES * 7 + 1;
         const MAX_VOL = 0.3;
+        const KEY_CLASS_NAME = 'keys__key';
         const KEY_FREQ = {
             "c0": 16.35,
             "c#0": 17.32,
@@ -134,16 +135,16 @@
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const filter = audioCtx.createBiquadFilter();
         // const distortion = audioCtx.createWaveShaper();
-        const merger = audioCtx.createChannelMerger(2);
+        audioCtx.createChannelMerger(2);
         const mainGain = audioCtx.createGain();
         // const source = audioCtx.createMediaStreamSource(stream);
         // source.connect(filter);
         // distortion.connect(biquadFilter);
         // filter.connect(mainGain);
         // mainGain.connect(audioCtx.destination)
-        // mainGain.connect(filter).connect(audioCtx.destination)
-        merger.connect(filter).connect(mainGain).connect(audioCtx.destination);
         mainGain.gain.setValueAtTime(1, audioCtx.currentTime);
+        mainGain.connect(filter).connect(audioCtx.destination);
+        // merger.connect(filter).connect(mainGain).connect(audioCtx.destination)
 
     // Manipulate the Biquad filter
 
@@ -301,7 +302,7 @@
             newOsc.gainNode.gain.value = 0;
             newOsc.osc.connect(newOsc.gainNode);
             // newOsc.gainNode.connect(audioCtx.destination);
-            newOsc.gainNode.connect(merger, 0, );
+            newOsc.gainNode.connect(mainGain);
             const id = generateRandomId();
             oscObject[id] = newOsc;
             console.log('oscObj', oscObject);
@@ -326,7 +327,7 @@
             $key.dataset.key = keyName.toLowerCase() + octave;
             $key.dataset.keyname = keyName.toLowerCase();
             $key.dataset.octave = octave;
-            $key.classList.add('keys__key');
+            $key.classList.add(KEY_CLASS_NAME);
             $key.id = `${keyName}${octave}`;
             console.log('last char', keyName.substr(keyName.length - 1));
             keyName.substr(keyName.length - 1) === '#' ? $key.classList.add('is--black') : 0;
@@ -367,7 +368,7 @@
 
             const htmlKeyId = key.slice(0,key.length - 1) + (parseInt(key.slice(key.length - 1,key.length)) - octaveShift);
             console.log('key', key, 'octaveShift', octaveShift, 'htmlKeyId', htmlKeyId);
-            document.querySelector(`.piano__key[data-key='${htmlKeyId}']`)?.classList.remove('is--pressed');
+            document.querySelector(`.${KEY_CLASS_NAME}[data-key='${htmlKeyId}']`)?.classList.remove('is--pressed');
         }
 
         function playKey(keyName, octave, velocity) {

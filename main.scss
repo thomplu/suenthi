@@ -51,10 +51,33 @@ body {
     &__control-unit {
         padding: 15px 40px;
     }
+
+    input[type='range'] {
+        overflow: hidden;
+        width: 80px;
+        -webkit-appearance: none;
+        background-color: #fff;
+    }
+
+    input[type='range']::-webkit-slider-runnable-track {
+        height: 10px;
+        -webkit-appearance: none;
+        color: #fff;
+        margin-top: -1px;
+    }
+
+    input[type='range']::-webkit-slider-thumb {
+        width: 10px;
+        -webkit-appearance: none;
+        height: 10px;
+        cursor: ew-resize;
+        background: #fff;
+        box-shadow: -80px 0 0 80px #43e5f7;
+    }
 }
 
 .filter {
-    background: #40E7E7;
+    background: #f155d1;
 }
 
 .envelope {
@@ -62,19 +85,19 @@ body {
 }
 
 .oscillator {
-    background: #72a5ef;
+    background: #b455f1;
 
 }
 
 .keyboard {
-    display: flex;
-    padding: 15px;
+    padding: 15px 15px 15px 69px;
+    position: relative;
 
     &__octave {
-        flex-basis: 39px;
-        flex-grow: 0;
-        margin-right: 15px;
-        flex-shrink: 0;
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
         color: white;
         display: flex;
         flex-direction: column;
