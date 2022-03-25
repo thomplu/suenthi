@@ -61,6 +61,9 @@ body {
     background: #43e5f7;
     box-shadow: -80px 0 0 80px #43e5f7; }
 
+.distortion {
+  background: #8887ff; }
+
 .lfo {
   background: #f1559b; }
 

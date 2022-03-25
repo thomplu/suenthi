@@ -121,6 +121,7 @@
         let filterQVal = 5;
         let lfoFreqVal = 1;
         let lfoGainVal = 300;
+        let distortionAmount = 0;
 
         //Node elements
         const $keyBoard = document.querySelector('.keyboard');
@@ -136,6 +137,7 @@
         const $filterQRange = document.getElementById('filter-q');
         const $lfoFreqRange = document.getElementById('lfo-freq');
         const $lfoGainRange = document.getElementById('lfo-gain');
+        const $distortionAmountRange = document.getElementById('distortion-amount');
         document.documentElement.style.setProperty('--white-key-num', whiteKeyNum);
 
         //Creating the audio chain elements
@@ -144,6 +146,7 @@
         const mainGain = audioCtx.createGain();
         const lfo = audioCtx.createOscillator();
         const lfoGain = audioCtx.createGain();
+        const distortion = audioCtx.createWaveShaper();
 
         lfo.type = "sine";
         lfo.frequency.value = lfoFreqVal;
@@ -152,18 +155,37 @@
         filter.frequency.value = filterFreq;
         filter.gain.value = 0;
         filter.Q.value = filterQVal;
+        distortion.curve = generateDistortionCurve(0);
+        distortion.oversample = "4x";
 
         // Wire the audio chain elements
         lfo.connect(lfoGain);
         lfoGain.connect(filter.frequency);
-        mainGain.gain.setValueAtTime(1, audioCtx.currentTime);
-        mainGain.connect(filter).connect(audioCtx.destination);
+        mainGain.gain.setValueAtTime(0.75, audioCtx.currentTime);
+        mainGain
+            .connect(filter)
+            .connect(distortion)
+            .connect(audioCtx.destination);
 
         lfo.start(0);
 
         let oscObject = {};
 
         createKeys();
+
+        function generateDistortionCurve(amount) {
+            let k = typeof amount === 'number' ? amount : 50,
+                n_samples = 44100,
+                curve = new Float32Array(n_samples),
+                deg = Math.PI / 180,
+                i = 0,
+                x;
+            for ( ; i < n_samples; ++i ) {
+                x = i * 2 / n_samples - 1;
+                curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
+            }
+            return curve;
+        }
 
 
         function onMIDIMessage(event) {
@@ -300,6 +322,13 @@
             lfoGainVal = parseInt(val);
             lfoGain.gain.value = lfoGainVal;
             console.log('lfo gain changed to', val, );
+        });
+
+        $distortionAmountRange.addEventListener('change', () => {
+            const val = $distortionAmountRange.value;
+            distortionAmount = parseInt(val);
+            distortion.curve = generateDistortionCurve(distortionAmount);
+            console.log('distortion amount changed to', val, );
         });
 
         function generateRandomId() {
