@@ -37,8 +37,10 @@ body {
 .controls {
   padding: 0 0 15px 0;
   font-size: 12px; }
-  .controls__control-unit {
+  .controls__section {
     padding: 15px 40px; }
+  .controls__label {
+    margin-bottom: 5px; }
   .controls input[type='range'] {
     overflow: hidden;
     width: 150px;
@@ -48,13 +50,19 @@ body {
     height: 15px;
     -webkit-appearance: none;
     color: #fff;
-    margin-top: -1px; }
+    margin-top: -1px;
+    border-radius: 999px; }
+    .controls input[type='range']::-webkit-slider-runnable-track #thumb {
+      background: #43e5f7; }
   .controls input[type='range']::-webkit-slider-thumb {
     width: 20px;
     height: 15px;
     cursor: pointer;
     background: #43e5f7;
     box-shadow: -80px 0 0 80px #43e5f7; }
+
+.lfo {
+  background: #f1559b; }
 
 .filter {
   background: #f155d1; }
@@ -111,6 +119,3 @@ body {
   color: white;
   width: 39px;
   border-radius: 4px; }
-
-.osc-type__label {
-  margin-bottom: 5px; }

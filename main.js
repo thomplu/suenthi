@@ -116,6 +116,7 @@ import './main.scss'
     let release = 0.45
     let attack = 0.0
     let filterFreq = 1000
+    let filterQVal = 5
     let lfoFreqVal = 1
     let lfoGainVal = 300
 
@@ -130,6 +131,7 @@ import './main.scss'
     const $attackRange = document.getElementById('attack')
     const $releaseRange = document.getElementById('release')
     const $filterFreqRange = document.getElementById('filter-freq')
+    const $filterQRange = document.getElementById('filter-q')
     const $lfoFreqRange = document.getElementById('lfo-freq')
     const $lfoGainRange = document.getElementById('lfo-gain')
     document.documentElement.style.setProperty('--white-key-num', whiteKeyNum);
@@ -139,21 +141,17 @@ import './main.scss'
     const filter = audioCtx.createBiquadFilter();
     const mainGain = audioCtx.createGain()
     const lfo = audioCtx.createOscillator()
-    const lfoFreqGain = audioCtx.createGain()
     const lfoGain = audioCtx.createGain()
 
     lfo.type = "sine"
     lfo.frequency.value = lfoFreqVal
-    // lfoFreqGain.gain.value = lfoFreqVal
     lfoGain.gain.value = lfoGainVal
     filter.type = "lowpass"
     filter.frequency.value = filterFreq
-    // filter.gain.setValueAtTime(25, audioCtx.currentTime);
     filter.gain.value = 0
-    filter.Q.value = 5
+    filter.Q.value = filterQVal
 
     // Wire the audio chain elements
-    // lfoFreqGain.connect(lfoFreqVal.frequency)
     lfo.connect(lfoGain)
     lfoGain.connect(filter.frequency)
     mainGain.gain.setValueAtTime(1, audioCtx.currentTime);
@@ -282,6 +280,12 @@ import './main.scss'
         console.log('filter freq changed to', val, filter)
     })
 
+    $filterQRange.addEventListener('change', () => {
+        const val = $filterQRange.value
+        filter.Q.value = filterQVal = parseInt(val)
+        console.log('filter Q changed to', val)
+    })
+
     $lfoFreqRange.addEventListener('change', () => {
         const val = $lfoFreqRange.value
         lfoFreqVal = parseInt(val)
@@ -301,15 +305,6 @@ import './main.scss'
     }
 
     function addOscVoice(key) {
-        // var gain = audioCtx.createGain();
-        // const oscillator = audioCtx.createOscillator();
-        // oscillator.type = 'square';
-        // oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // value in hertz
-        // gain.gain.value = 0;
-        // oscillator.connect(gain);
-        // gain.connect(audioCtx.destination);
-        // oscillator.start();
-
         const newOsc = {
             osc: audioCtx.createOscillator(),
             gainNode: audioCtx.createGain(),
@@ -317,10 +312,8 @@ import './main.scss'
         };
 
         newOsc.osc.type = oscType;
-
         newOsc.gainNode.gain.value = 0;
         newOsc.osc.connect(newOsc.gainNode);
-        // newOsc.gainNode.connect(audioCtx.destination);
         newOsc.gainNode.connect(mainGain);
         const id = generateRandomId()
         oscObject[id] = newOsc
