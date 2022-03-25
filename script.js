@@ -111,13 +111,15 @@
             "c8": 4186.01
         };
 
-        //Controls values
+        //Controls variables with default values
 
         let octaveShift = 0;
         let oscType = 'sine';
         let release = 0.45;
         let attack = 0.0;
         let filterFreq = 1000;
+        let lfoFreqVal = 1;
+        let lfoGainVal = 300;
 
         //Node elements
         const $keyBoard = document.querySelector('.keyboard');
@@ -130,28 +132,37 @@
         const $attackRange = document.getElementById('attack');
         const $releaseRange = document.getElementById('release');
         const $filterFreqRange = document.getElementById('filter-freq');
+        const $lfoFreqRange = document.getElementById('lfo-freq');
+        const $lfoGainRange = document.getElementById('lfo-gain');
         document.documentElement.style.setProperty('--white-key-num', whiteKeyNum);
 
+        //Creating the audio chain elements
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const filter = audioCtx.createBiquadFilter();
-        // const distortion = audioCtx.createWaveShaper();
         audioCtx.createChannelMerger(2);
         const mainGain = audioCtx.createGain();
-        // const source = audioCtx.createMediaStreamSource(stream);
-        // source.connect(filter);
-        // distortion.connect(biquadFilter);
-        // filter.connect(mainGain);
-        // mainGain.connect(audioCtx.destination)
+        const lfo = audioCtx.createOscillator();
+        audioCtx.createGain();
+        const lfoGain = audioCtx.createGain();
+
+        lfo.type = "sine";
+        lfo.frequency.value = lfoFreqVal;
+        // lfoFreqGain.gain.value = lfoFreqVal
+        lfoGain.gain.value = lfoGainVal;
+        filter.type = "lowpass";
+        filter.frequency.value = filterFreq;
+        // filter.gain.setValueAtTime(25, audioCtx.currentTime);
+        filter.gain.value = 0;
+        filter.Q.value = 5;
+
+        // Wire the audio chain elements
+        // lfoFreqGain.connect(lfoFreqVal.frequency)
+        lfo.connect(lfoGain);
+        lfoGain.connect(filter.frequency);
         mainGain.gain.setValueAtTime(1, audioCtx.currentTime);
         mainGain.connect(filter).connect(audioCtx.destination);
-        // merger.connect(filter).connect(mainGain).connect(audioCtx.destination)
 
-    // Manipulate the Biquad filter
-
-        filter.type = "lowpass";
-        filter.frequency.setValueAtTime(filterFreq, audioCtx.currentTime);
-        filter.gain.setValueAtTime(25, audioCtx.currentTime);
-
+        lfo.start(0);
 
         let oscObject = {};
 
@@ -256,26 +267,36 @@
 
         $attackRange.addEventListener('change', e => {
             const val = $attackRange.value;
-            attack = parseInt(val);
+            attack = Number(val);
             console.log('attack changed to', val);
         });
 
         $releaseRange.addEventListener('change', e => {
             const val = $releaseRange.value;
-            release = parseInt(val);
+            release = Number(val);
             console.log('release changed to', val);
         });
 
-        $filterFreqRange.addEventListener('change', e => {
+        $filterFreqRange.addEventListener('change', () => {
             const val = $filterFreqRange.value;
             filterFreq = parseInt(val);
-            filter.frequency.value = parseInt(filterFreq);
-            mainGain.disconnect(filter);
-            mainGain.connect(filter);
+            filter.type = "lowpass";
+            filter.frequency.setValueAtTime(parseInt(filterFreq), audioCtx.currentTime);
             console.log('filter freq changed to', val, filter);
         });
 
+        $lfoFreqRange.addEventListener('change', () => {
+            const val = $lfoFreqRange.value;
+            lfoFreqVal = parseInt(val);
+            lfo.frequency.value = lfoFreqVal;
+            console.log('lfo freq changed to', val);
+        });
 
+        $lfoGainRange.addEventListener('change', () => {
+            const val = $lfoFreqRange.value;
+            lfoGainVal = parseInt(val);
+            console.log('lfo gain changed to', val);
+        });
 
         function generateRandomId() {
             return Math.floor(Math.random()*0xca0e373ebffff+0x05c5e45240000).toString(36)
