@@ -137,7 +137,6 @@ import './main.scss'
     //Creating the audio chain elements
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const filter = audioCtx.createBiquadFilter();
-    const merger = audioCtx.createChannelMerger(2);
     const mainGain = audioCtx.createGain()
     const lfo = audioCtx.createOscillator()
     const lfoFreqGain = audioCtx.createGain()
@@ -291,9 +290,10 @@ import './main.scss'
     })
 
     $lfoGainRange.addEventListener('change', () => {
-        const val = $lfoFreqRange.value
+        const val = $lfoGainRange.value
         lfoGainVal = parseInt(val)
-        console.log('lfo gain changed to', val)
+        lfoGain.gain.value = lfoGainVal
+        console.log('lfo gain changed to', val, )
     })
 
     function generateRandomId() {
