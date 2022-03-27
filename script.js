@@ -111,22 +111,38 @@
             "c8": 4186.01
         };
 
-        //Controls variables with default values
-
         let octaveShift = 0;
-        let oscType = 'sine';
-        let release = 0.45;
-        let attack = 0.0;
-        let filterFreq = 1000;
-        let filterQVal = 5;
-        let lfoFreqVal = 1;
-        let lfoGainVal = 300;
-        let distortionAmount = 0;
+
+        const preset = [
+            {
+                meta: {
+                    name:'default',
+                },
+                params: {
+                    oscType: 'sine',
+                    attack: 0.0,
+                    decay: 0.2,
+                    sustain: 1,
+                    release: 0.45,
+                    filterFreq: 1000,
+                    filterQVal: 5,
+                    filterType: 'lowpass',
+                    lfoFreqVal: 1,
+                    lfoType: 'sine',
+                    lfoGainVal: 300,
+                    distortionAmount: 0,
+                    noiseLevel: 0
+                }
+            }
+        ];
+
+        //initialize local preset
+
+        let params = JSON.parse(JSON.stringify(preset[0].params));
 
         //Node elements
         const $keyBoard = document.querySelector('.keyboard');
         const $keys = document.querySelector('.keys');
-        document.querySelector('#audio-btn');
         const $octaveUpBtn = document.querySelector('.octave__btn-up');
         const $octaveDownBtn = document.querySelector('.octave__btn-down');
         const $octaveDisplay = document.querySelector('.octave__val');
@@ -138,7 +154,7 @@
         const $lfoFreqRange = document.getElementById('lfo-freq');
         const $lfoGainRange = document.getElementById('lfo-gain');
         const $distortionAmountRange = document.getElementById('distortion-amount');
-        document.documentElement.style.setProperty('--white-key-num', whiteKeyNum);
+        document.documentElement.style.setProperty('--white-key-num', whiteKeyNum.toString());
 
         //Creating the audio chain elements
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -147,31 +163,62 @@
         const lfo = audioCtx.createOscillator();
         const lfoGain = audioCtx.createGain();
         const distortion = audioCtx.createWaveShaper();
+        const whiteNoise = audioCtx.createBufferSource();
+        const whiteNoiseGain = audioCtx.createGain();
 
-        lfo.type = "sine";
-        lfo.frequency.value = lfoFreqVal;
-        lfoGain.gain.value = lfoGainVal;
-        filter.type = "lowpass";
-        filter.frequency.value = filterFreq;
-        filter.gain.value = 0;
-        filter.Q.value = filterQVal;
-        distortion.curve = generateDistortionCurve(0);
-        distortion.oversample = "4x";
+        //
+        const oscObject = {};
 
-        // Wire the audio chain elements
-        lfo.connect(lfoGain);
-        lfoGain.connect(filter.frequency);
-        mainGain.gain.setValueAtTime(0.75, audioCtx.currentTime);
-        mainGain
-            .connect(filter)
-            .connect(distortion)
-            .connect(audioCtx.destination);
+        init();
 
-        lfo.start(0);
+        function init(){
+            loadPreset(0);
+            wireModules();
+            startModules();
+            createKeys();
 
-        let oscObject = {};
+            if (navigator.requestMIDIAccess) {
+                navigator.requestMIDIAccess().then(midiAccess => {
+                    startLoggingMIDIInput(midiAccess);
+                });
+            }
+        }
 
-        createKeys();
+        function loadPreset(index) {
+            console.log('loadPreset this', this);
+            params = JSON.parse(JSON.stringify(preset[index].params));
+            lfo.type = params.lfoType;
+            lfo.frequency.value = params.lfoFreqVal;
+            lfoGain.gain.value = params.lfoGainVal;
+            filter.type = params.filterType;
+            filter.frequency.value = params.filterFreq;
+            filter.Q.value = params.filterQVal;
+            distortion.curve = generateDistortionCurve(0);
+            distortion.oversample = "4x";
+            whiteNoise.buffer = generateNoiseBuffer();
+            whiteNoise.loop = true;
+            whiteNoiseGain.gain.value = params.noiseLevel;
+            mainGain.gain.value = 0.75;
+        }
+
+        function wireModules() {
+            // Wire the audio chain elements
+            lfo.connect(lfoGain);
+            lfoGain.connect(filter.frequency);
+            mainGain
+                .connect(filter)
+                .connect(distortion)
+                .connect(audioCtx.destination);
+
+            whiteNoise
+                .connect(whiteNoiseGain)
+                .connect(audioCtx.destination);
+        }
+
+        function startModules() {
+            whiteNoise.start(0);
+            lfo.start(0);
+        }
 
         function generateDistortionCurve(amount) {
             let k = typeof amount === 'number' ? amount : 50,
@@ -187,6 +234,15 @@
             return curve;
         }
 
+        function generateNoiseBuffer() {
+            const bufferSize = 2 * audioCtx.sampleRate,
+                noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate),
+                output = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
+            return noiseBuffer
+        }
 
         function onMIDIMessage(event) {
 
@@ -226,12 +282,6 @@
             midiAccess.inputs.forEach(entry => {
                 // console.log('entry', entry)
                 entry.onmidimessage = onMIDIMessage;
-            });
-        }
-
-        if (navigator.requestMIDIAccess) {
-            navigator.requestMIDIAccess().then(midiAccess => {
-                startLoggingMIDIInput(midiAccess);
             });
         }
 
@@ -280,54 +330,52 @@
         });
 
         $oscTypeInputs.addEventListener('click', e => {
-            oscType = $oscTypeInputs.querySelector('input:checked').value || oscType;
-            console.log('new osc type', oscType);
+            params.oscType = $oscTypeInputs.querySelector('input:checked').value;
+            console.log('new osc type', params.oscType);
         });
 
         $attackRange.addEventListener('change', e => {
             const val = $attackRange.value;
-            attack = Number(val);
+            params.attack = Number(val);
             console.log('attack changed to', val);
         });
 
         $releaseRange.addEventListener('change', e => {
             const val = $releaseRange.value;
-            release = Number(val);
+            params.release = Number(val);
             console.log('release changed to', val);
         });
 
         $filterFreqRange.addEventListener('change', () => {
             const val = $filterFreqRange.value;
-            filterFreq = parseInt(val);
+            params.filterFreq = parseInt(val);
             filter.type = "lowpass";
-            filter.frequency.setValueAtTime(parseInt(filterFreq), audioCtx.currentTime);
+            filter.frequency.setValueAtTime(parseInt(params.filterFreq), audioCtx.currentTime);
             console.log('filter freq changed to', val, filter);
         });
 
         $filterQRange.addEventListener('change', () => {
             const val = $filterQRange.value;
-            filter.Q.value = filterQVal = parseInt(val);
+            filter.Q.value = params.filterQVal = parseInt(val);
             console.log('filter Q changed to', val);
         });
 
         $lfoFreqRange.addEventListener('change', () => {
             const val = $lfoFreqRange.value;
-            lfoFreqVal = parseInt(val);
-            lfo.frequency.value = lfoFreqVal;
+            lfo.frequency.value = params.lfoFreqVal = parseInt(val);
             console.log('lfo freq changed to', val);
         });
 
         $lfoGainRange.addEventListener('change', () => {
             const val = $lfoGainRange.value;
-            lfoGainVal = parseInt(val);
-            lfoGain.gain.value = lfoGainVal;
+            lfoGain.gain.value = params.lfoGainVal = parseInt(val);
             console.log('lfo gain changed to', val, );
         });
 
         $distortionAmountRange.addEventListener('change', () => {
             const val = $distortionAmountRange.value;
-            distortionAmount = parseInt(val);
-            distortion.curve = generateDistortionCurve(distortionAmount);
+            params.distortionAmount = parseInt(val);
+            distortion.curve = generateDistortionCurve(params.distortionAmount);
             console.log('distortion amount changed to', val, );
         });
 
@@ -342,7 +390,7 @@
                 key: key
             };
 
-            newOsc.osc.type = oscType;
+            newOsc.osc.type = params.oscType;
             newOsc.gainNode.gain.value = 0;
             newOsc.osc.connect(newOsc.gainNode);
             newOsc.gainNode.connect(mainGain);
@@ -400,14 +448,14 @@
                 console.error('Osc Index not found for ' + key);
                 return
             }
-            oscObject[oscId].gainNode.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + release);
+            oscObject[oscId].gainNode.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + params.release);
             oscObject[oscId].release = true;
             setTimeout(() => {
                 oscObject[oscId].osc.stop();
                 console.log('REMOVE OSC');
                 delete oscObject[oscId];
                 console.log('new stop oscObj', JSON.stringify(oscObject));
-            }, release * 1000);
+            }, params.release * 1000);
 
             const htmlKeyId = key.slice(0,key.length - 1) + (parseInt(key.slice(key.length - 1,key.length)) - octaveShift);
             console.log('key', key, 'octaveShift', octaveShift, 'htmlKeyId', htmlKeyId);
@@ -436,7 +484,7 @@
             if (velocity > 1) {
                 velocity = 1;
             }
-            oscObject[oscId].gainNode.gain.linearRampToValueAtTime( MAX_VOL * velocity, audioCtx.currentTime + attack);
+            oscObject[oscId].gainNode.gain.linearRampToValueAtTime( MAX_VOL * velocity, audioCtx.currentTime + params.attack);
             // gain.gain.value = MAX_VOL * velocity;
             console.log('new play oscObj', oscObject[oscId], JSON.stringify(oscObject));
         }
