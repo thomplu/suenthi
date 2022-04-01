@@ -119,9 +119,9 @@
                     name:'default',
                 },
                 params: {
-                    oscType: 'sine',
+                    oscType: 'sawtooth',
                     attack: 0.0,
-                    decay: 0.2,
+                    decay: 0.0,
                     sustain: 1,
                     release: 0.45,
                     filterFreq: 1000,
@@ -186,20 +186,26 @@
         }
 
         function loadPreset(index) {
-            console.log('loadPreset this', this);
             params = JSON.parse(JSON.stringify(preset[index].params));
-            lfo.type = params.lfoType;
-            lfo.frequency.value = params.lfoFreqVal;
-            lfoGain.gain.value = params.lfoGainVal;
-            filter.type = params.filterType;
-            filter.frequency.value = params.filterFreq;
-            filter.Q.value = params.filterQVal;
-            distortion.curve = generateDistortionCurve(0);
+
             distortion.oversample = "4x";
             whiteNoise.buffer = generateNoiseBuffer();
-            whiteNoise.loop = true;
-            whiteNoiseGain.gain.value = params.noiseLevel;
             mainGain.gain.value = 0.75;
+            whiteNoise.loop = true;
+
+            lfo.type = params.lfoType;
+            lfo.frequency.value = $lfoFreqRange.value = params.lfoFreqVal;
+            lfoGain.gain.value = $lfoGainRange.value = params.lfoGainVal;
+            filter.type = params.filterType;
+            filter.frequency.value = $filterFreqRange.value = params.filterFreq;
+            filter.Q.value = $filterQRange.value = params.filterQVal;
+            distortion.curve = generateDistortionCurve(params.distortionAmount);
+            $distortionAmountRange.value = params.distortionAmount;
+            whiteNoiseGain.gain.value = params.noiseLevel;
+            $attackRange.value = params.attack;
+            $decayRange.value = params.decay;
+            $sustainRange.value = params.sustain;
+            $releaseRange.value = params.release;
         }
 
         function wireModules() {
