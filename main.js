@@ -146,6 +146,8 @@ import './main.scss'
     const $octaveDisplay = document.querySelector('.octave__val')
     const $oscTypeInputs = document.querySelector('.controls__osc-type-inputs')
     const $attackRange = document.getElementById('attack')
+    const $decayRange = document.getElementById('decay')
+    const $sustainRange = document.getElementById('sustain')
     const $releaseRange = document.getElementById('release')
     const $filterFreqRange = document.getElementById('filter-freq')
     const $filterQRange = document.getElementById('filter-q')
@@ -164,7 +166,6 @@ import './main.scss'
     const whiteNoise = audioCtx.createBufferSource()
     const whiteNoiseGain = audioCtx.createGain()
 
-    //
     const oscObject = {}
 
     init()
@@ -332,19 +333,31 @@ import './main.scss'
         console.log('new osc type', params.oscType);
     })
 
-    $attackRange.addEventListener('change', e => {
+    $attackRange.addEventListener('input', e => {
         const val = $attackRange.value
         params.attack = Number(val)
         console.log('attack changed to', val)
     })
 
-    $releaseRange.addEventListener('change', e => {
+    $decayRange.addEventListener('input', e => {
+        const val = $decayRange.value
+        params.decay = Number(val)
+        console.log('decay changed to', val)
+    })
+
+    $sustainRange.addEventListener('input', e => {
+        const val = $sustainRange.value
+        params.sustain = Number(val)
+        console.log('sustain changed to', val)
+    })
+
+    $releaseRange.addEventListener('input', e => {
         const val = $releaseRange.value
         params.release = Number(val)
         console.log('release changed to', val)
     })
 
-    $filterFreqRange.addEventListener('change', () => {
+    $filterFreqRange.addEventListener('input', () => {
         const val = $filterFreqRange.value
         params.filterFreq = parseInt(val)
         filter.type = "lowpass"
@@ -352,30 +365,58 @@ import './main.scss'
         console.log('filter freq changed to', val, filter)
     })
 
-    $filterQRange.addEventListener('change', () => {
+    $filterQRange.addEventListener('input', () => {
         const val = $filterQRange.value
         filter.Q.value = params.filterQVal = parseInt(val)
         console.log('filter Q changed to', val)
     })
 
-    $lfoFreqRange.addEventListener('change', () => {
+    $lfoFreqRange.addEventListener('input', () => {
         const val = $lfoFreqRange.value
         lfo.frequency.value = params.lfoFreqVal = parseInt(val)
         console.log('lfo freq changed to', val)
     })
 
-    $lfoGainRange.addEventListener('change', () => {
+    $lfoGainRange.addEventListener('input', () => {
         const val = $lfoGainRange.value
         lfoGain.gain.value = params.lfoGainVal = parseInt(val)
         console.log('lfo gain changed to', val, )
     })
 
-    $distortionAmountRange.addEventListener('change', () => {
+    $distortionAmountRange.addEventListener('input', () => {
         const val = $distortionAmountRange.value
         params.distortionAmount = parseInt(val)
         distortion.curve = generateDistortionCurve(params.distortionAmount)
         console.log('distortion amount changed to', val, )
     })
+
+    async function startEnvelope(audioParam, maxVal, attack, decay, sustain) {
+        console.log('start attack')
+        return new Promise((resolve) => {
+            audioParam.linearRampToValueAtTime(maxVal, audioCtx.currentTime + attack)
+            audioParam.linearRampToValueAtTime(maxVal * sustain, audioCtx.currentTime + attack + decay)
+            setTimeout(() => {
+                console.log('decay done! Resolve!')
+                resolve()
+            }, attack * 1000 + decay * 1000)
+            // audioParam.linearRampToValueAtTime(maxVal, audioCtx.currentTime + attack)
+            // setTimeout(() => {
+            //     console.log('attack done, start decay')
+            //     audioParam.linearRampToValueAtTime(maxVal * sustain, audioCtx.currentTime + decay)
+            //     setTimeout(() => {
+            //         console.log('decay done! Resolve!')
+            //         resolve()
+            //     }, decay * 1000)
+            // }, attack * 1000)
+        })
+
+    }
+
+    async function stopEnvelope(audioParam, sustain, release) {
+
+
+        return Promise.resolve();
+    }
 
     function generateRandomId() {
         return Math.floor(Math.random()*0xca0e373ebffff+0x05c5e45240000).toString(36)
@@ -446,7 +487,9 @@ import './main.scss'
             console.error('Osc Index not found for ' + key);
             return
         }
-        oscObject[oscId].gainNode.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + params.release);
+        // oscObject[oscId].gainNode.gain.cancelAndHoldAtTime(audioCtx.currentTime)
+        oscObject[oscId].gainNode.gain.cancelScheduledValues(audioCtx.currentTime)
+        oscObject[oscId].gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + params.release);
         oscObject[oscId].release = true
         setTimeout(() => {
             oscObject[oscId].osc.stop();
@@ -482,7 +525,11 @@ import './main.scss'
         if (velocity > 1) {
             velocity = 1;
         }
-        oscObject[oscId].gainNode.gain.linearRampToValueAtTime( MAX_VOL * velocity, audioCtx.currentTime + params.attack);
+        startEnvelope(oscObject[oscId].gainNode.gain, MAX_VOL * velocity, params.attack, params.decay, params.sustain).then(() => {
+            console.log('startEnvelope finished!')
+        })
+
+        // oscObject[oscId].gainNode.gain.exponentialRampToValueAtTime( MAX_VOL * velocity, audioCtx.currentTime + params.attack);
         // gain.gain.value = MAX_VOL * velocity;
         console.log('new play oscObj', oscObject[oscId], JSON.stringify(oscObject));
     }

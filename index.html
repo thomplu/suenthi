@@ -59,14 +59,24 @@
         </div>
         <div class="controls__section envelope">
             <div class="controls__label">Envelope</div>
-            <div class="adsr__range">
+            <div class="envelope__range">
                 <input type="range" id="attack" name="attack"
                        min="0" max="3" step="0.01" value="0">
                 <label for="attack">Attack</label>
             </div>
-            <div class="adsr__range">
+            <div class="envelope__range">
+                <input type="range" id="decay" name="decay"
+                       min="0.001" max="3" step="0.001" value="0.1">
+                <label for="decay">Decay</label>
+            </div>
+            <div class="envelope__range">
+                <input type="range" id="sustain" name="sustain"
+                       min="0" max="1" step="0.001" value="0.5">
+                <label for="sustain">Sustain</label>
+            </div>
+            <div class="envelope__range">
                 <input type="range" id="release" name="release"
-                       min="0" max="3" step="0.01" value="0.45">
+                       min="0" max="6" step="0.01" value="0.45">
                 <label for="release">Release</label>
             </div>
         </div>
