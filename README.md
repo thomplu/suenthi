@@ -16,7 +16,7 @@ Tweak the filter parameters with the Cuttof frequency, Resonance and LFO to crea
 
 ## Envelope
 
-Addjust the gain envelope and create short rhytmic sounds or long eveloving pads.
+Addjust the gain envelope and create short rhytmic sounds or long evolving pads.
 
 
 
