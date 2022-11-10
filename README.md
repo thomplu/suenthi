@@ -1,5 +1,5 @@
 # Suenthi - A tiny polyphonic pure JS Synthesizer
-https://plusklang.github.io/suenthi/
+https://thomplu.github.io/suenthi/
 Made with the Javascrip Audio API.
 
 ## MIDI Controller support
